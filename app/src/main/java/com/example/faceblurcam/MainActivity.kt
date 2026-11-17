@@ -213,3 +213,5 @@ class FaceBlurEffect(processor: FaceBlurProcessor) : CameraEffect(
     Consumer<Throwable> { t -> Log.e("FaceBlurCam", "Blur effect error", t) }
 )
 
+
+
