@@ -22,13 +22,13 @@ import androidx.camera.core.CameraEffect
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.effects.OverlayEffect
 import androidx.camera.mlkit.vision.MlKitAnalyzer
-import androidx.camera.video.AudioConfig
 import androidx.camera.video.MediaStoreOutputOptions
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoRecordEvent
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
+import androidx.camera.view.video.AudioConfig
 import androidx.core.content.ContextCompat
 import androidx.core.util.Consumer
 import com.google.mlkit.vision.face.Face
@@ -141,10 +141,7 @@ class MainActivity : AppCompatActivity() {
     private fun buildGlBlurEffect(): CameraEffect {
         val p = FaceBlurProcessor()
         processor = p
-        return CameraEffect.Builder(FaceBlurProcessor.TARGETS)
-            .setSurfaceProcessor(p.glExecutor, p)
-            .setOnError(Consumer { t -> Log.e(TAG, "Blur effect error", t) })
-            .build()
+        return FaceBlurEffect(p)
     }
 
     private fun buildOverlayFallback(): CameraEffect {
@@ -207,3 +204,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
+/** CameraEffect's constructor is protected in CameraX 1.4, so the effect is a tiny subclass. */
+class FaceBlurEffect(processor: FaceBlurProcessor) : CameraEffect(
+    FaceBlurProcessor.TARGETS,
+    processor.glExecutor,
+    processor,
+    Consumer<Throwable> { t -> Log.e("FaceBlurCam", "Blur effect error", t) }
+)
+
